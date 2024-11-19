@@ -1,0 +1,227 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+#main-content {
+  display: none;
+}
+
+.table-pwn {
+  width: 100%;
+  /* Adjust table size */
+  border-collapse: collapse;
+  border: 1px solid #dee2e6;
+}
+
+.table-pwn th,
+.table-pwn td {
+  padding: 0.2rem;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table-pwn-logging {
+  width: 100%;
+  /* Adjust table size */
+  border-collapse: collapse;
+  border: 1px solid #dee2e6;
+}
+
+.table-pwn-logging th {
+  padding: 0.2rem;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.navbar{
+  height: 60px;
+}
+
+.table-pwn thead th {
+  background-color: #e9ecef;
+}
+
+.table-pwn-logging thead th {
+  background-color: #e9ecef;
+}
+
+.Abgemeldet {
+  background-color: black;
+  color: white;
+}
+
+.Frei {
+  background-color: #a3e77f;
+}
+
+.in.Arbeit {
+  background-color: #cc0066;
+  color: white;
+  /* Blinking animation */
+}
+
+.in.Arbeit2 {
+  background-color: #cc0066;
+  color: white;
+}
+
+.Beschäftigt {
+  background-color: #ff5348;
+}
+
+.Erhalten {
+  background-color: #48f9ff;
+}
+
+.Pause {
+  background-color: orange;
+}
+
+.Übernommen {
+  background-color: rgb(99, 64, 0);
+  color: white;
+}
+
+.Sprechwunsch {
+  background-color: rgb(0, 141, 31);
+  color: white;
+}
+
+.Sprechwunsch2 {
+  background-color: rgb(0, 141, 31);
+  color: white;
+}
+
+
+@keyframes blinkRed {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+input[type="text"] {
+  padding: 0.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  width: 30%;
+  transition: all 0.3s ease-in-out;
+}
+
+input[type="text"]:focus {
+  border-color: #80bdff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(128, 189, 255, 0.5);
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#tooltip-box {
+  position: absolute;
+  display: none;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+}
+
+#tooltip-box b {
+  font-weight: bold;
+}
+
+#tooltip-box::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #f0f0f0 transparent transparent transparent;
+}
+
+/* Beispiel für CSS-Styling */
+.table-message {
+  text-align: center;
+  font-weight: bold;
+  color: #555;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.container {
+  /* Standardmäßig verstecken */
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: 100px 100px 100px;
+  gap: 10px;
+  text-align: center;
+  display: grid;
+  /* Zentriert den Text in den Boxen */
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  /* Anordnung der Nummer und des Status-Textes */
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  border-radius: 8px;
+  position: relative;
+  /* Positionierung des Texts */
+  cursor: pointer;
+  /* Zeige an, dass die Box interaktiv ist */
+  transition: transform 0.2s ease;
+  /* Animationseffekt beim Hover */
+}
+
+.box:hover {
+  transform: scale(1.1);
+  /* Vergrößere die Box leicht beim Hover */
+}
+
+.box-number {
+  margin-bottom: 5px;
+  /* Abstand zwischen Nummer und Status */
+}
+
+.status {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.status-text {
+  font-size: 14px;
+}
+
+#map {
+  height: 400px; /* Höhe der Karte anpassen */
+}
