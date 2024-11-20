@@ -22,7 +22,7 @@ const Mobile = () => {
 
     // Funktion, um Mitarbeiter-Daten zu holen
     const fetchMitarbeiter = () => {
-        fetch('http://localhost:5000/api/fetchMitarbeiter')
+        fetch('http://localhost:3520/api/mitarbeiter/fetchMitarbeiter')
             .then((response) => response.json())
             .then((data) => setTableData(data))
             .catch((error) => console.error('Fehler beim Abrufen der Mitarbeiterdaten:', error));
@@ -54,7 +54,7 @@ const Mobile = () => {
         const seit = getCurrentTime();
 
         try {
-            const response = await fetch('http://localhost:5000/api/updateStatus', {
+            const response = await fetch('http://localhost:3520/api/status/update', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,45 +77,14 @@ const Mobile = () => {
         }
     };
 
-    // Funktion, um den Namen im Backend zu aktualisieren (bei Anmeldung)
-    // const updateName = async (name) => {
-    //     if (!usernummer || !name) {
-    //         console.log('Fehler: Usernummer oder Name fehlen');
-    //         return;
-    //     }
-    //
-    //     console.log('Sende Update-Request für den Namen:', name);
-    //
-    //     try {
-    //         const response = await fetch('http://localhost:5000/api/updateName', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({
-    //                 usernummer: usernummer,
-    //                 name: name
-    //             }),
-    //         });
-    //
-    //         if (!response.ok) {
-    //             const message = await response.text();
-    //             throw new Error(message || 'Fehler beim Aktualisieren des Namens');
-    //         }
-    //
-    //         console.log('Name erfolgreich aktualisiert');
-    //     } catch (error) {
-    //         console.error('Fehler beim Update des Namens:', error.message);
-    //         alert(`Fehler: ${error.message}`);
-    //     }
-    // };
+
 
     // Funktion, um den Namen im Backend zu löschen (bei Abmeldung)
     const deleteName = async () => {
         if (!usernummer) return;
 
         try {
-            const response = await fetch('http://localhost:5000/api/deleteName', {
+            const response = await fetch('http://localhost:3520/api/user/deleteName', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +140,7 @@ const Mobile = () => {
 
                             if (userName) {
                                 try {
-                                    const response = await fetch('http://localhost:5000/api/updateName', {
+                                    const response = await fetch('http://localhost:3520/api/user/updateName', {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
