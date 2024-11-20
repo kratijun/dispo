@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Mobile.css';
 
-// Dummy-API-Response für Status
 const statuses = [
     { id: 0, text: 'Abgemeldet' },
     { id: 1, text: 'Frei' },
@@ -14,193 +13,178 @@ const statuses = [
 ];
 
 const Mobile = () => {
-    const [tableData, setTableData] = useState([]);  // Für Mitarbeiter-Daten
-    const [selectedUser, setSelectedUser] = useState(null);  // Den aktuellen User speichern
-    const [usernummer, setUsernummer] = useState(null); // Aktuelle Usernummer
-    const [userName, setUserName] = useState(''); // Benutzername
-    const [currentStatus, setCurrentStatus] = useState(''); // Aktueller Status
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [is2FAVerified, setIs2FAVerified] = useState(false);
+    const [username, setUsername] = useState('');
+    const [otpCode, setOtpCode] = useState('');
+    const [userData, setUserData] = useState(null);
+    const [error, setError] = useState(null); // Fehlerstatus
 
-    // Funktion, um Mitarbeiter-Daten zu holen
-    const fetchMitarbeiter = () => {
-        fetch('http://localhost:3520/api/mitarbeiter/fetchMitarbeiter')
-            .then((response) => response.json())
-            .then((data) => setTableData(data))
-            .catch((error) => console.error('Fehler beim Abrufen der Mitarbeiterdaten:', error));
-    };
+    // Login-Handler
+    const handleLogin = async () => {
+        setError(null); // Fehler zurücksetzen
+        try {
+            const response = await fetch('http://localhost:3520/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username }),
+            });
 
-    // Funktion, um den gespeicherten Namen zu laden
-    const loadUserName = () => {
-        const savedName = localStorage.getItem('userName');
-        if (savedName) {
-            setUserName(savedName);
+            if (!response.ok) {
+                const message = await response.text();
+                throw new Error(message || 'Login fehlgeschlagen');
+            }
+
+            const { username: user } = await response.json();
+            localStorage.setItem('username', username);
+            alert('Passwort korrekt, OTP wurde gesendet!');
+            setIsLoggedIn(true);
+        } catch (error) {
+            console.error('Fehler beim Login:', error.message);
+            setError(error.message); // Fehler anzeigen
         }
     };
 
-    // Funktion, um den Namen zu speichern
-    const saveUserName = (name) => {
-        localStorage.setItem('userName', name);
+    // 2FA-Handler
+    const handleVerifyOTP = async () => {
+        setError(null);
+        try {
+            const response = await fetch('http://localhost:3520/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otpCode }),
+            });
+
+            if (!response.ok) {
+                const message = await response.text();
+                throw new Error(message || 'OTP-Überprüfung fehlgeschlagen');
+            }
+
+            alert('2FA erfolgreich!');
+            setIs2FAVerified(true);
+            fetchUserData();
+        } catch (error) {
+            console.error('Fehler bei der OTP-Überprüfung:', error.message);
+            setError(error.message);
+        }
     };
 
-    // Funktion, die die Uhrzeit im Format 'HH:mm' zurückgibt
-    const getCurrentTime = () => {
-        const now = new Date();
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
+    // Benutzer-Daten abrufen
+    const fetchUserData = async () => {
+        setError(null);
+        try {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                console.error("Benutzername fehlt");
+                return;
+            }
+
+            const response = await fetch(`http://localhost:3520/api/user/getUserData/${username}`, {
+                method: 'GET',
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Fehler beim Abrufen der Benutzerdaten');
+            }
+
+            const data = await response.json();
+            setUserData(data);
+        } catch (error) {
+            console.error('Fehler beim Abrufen der Benutzerdaten:', error.message);
+            setError(error.message);
+        }
     };
 
-    // Status setzen (API-Call)
+    // Status-Änderung
     const setStatus = async (status) => {
-        const seit = getCurrentTime();
+        if (!userData) return;
 
         try {
             const response = await fetch('http://localhost:3520/api/status/update', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    status: status,
-                    usernummer: usernummer, // Aktuelle Usernummer
-                    seit: seit,
+                    username: userData.username,
+                    status,
+                    seit: new Date().toLocaleTimeString(),
                 }),
             });
 
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || 'Fehler beim Aktualisieren des Status');
+                throw new Error(message || 'Fehler beim Setzen des Status');
             }
-            setCurrentStatus(status); // Aktuellen Status setzen
+
+            setUserData((prevData) => ({
+                ...prevData,
+                status,
+            }));
         } catch (error) {
-            console.error('Fehler:', error.message);
-            alert(`Fehler: ${error.message}`);
+            console.error('Fehler beim Setzen des Status:', error.message);
+            alert(error.message);
         }
     };
 
+    // Fehleranzeige
+    const showError = error && <p className="error">{error}</p>;
 
-
-    // Funktion, um den Namen im Backend zu löschen (bei Abmeldung)
-    const deleteName = async () => {
-        if (!usernummer) return;
-
-        try {
-            const response = await fetch('http://localhost:3520/api/user/deleteName', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    usernummer: usernummer
-                }),
-            });
-
-            if (!response.ok) {
-                const message = await response.text();
-                throw new Error(message || 'Fehler beim Löschen des Namens');
-            }
-
-            console.log('Name erfolgreich gelöscht');
-        } catch (error) {
-            console.error('Fehler:', error.message);
-        }
+    // Logout-Handler
+    const handleLogout = () => {
+        localStorage.removeItem('username'); // Benutzernamen aus dem localStorage entfernen
+        setIsLoggedIn(false); // Den Login-Zustand zurücksetzen
+        setUserData(null); // Benutzer-Daten zurücksetzen
+        alert('Du hast dich erfolgreich abgemeldet');
     };
 
-    // Logout-Funktion
-    const logoutUser = () => {
-        setSelectedUser(null); // Zurück zur Auswahl
-        setUsernummer(null);   // Usernummer zurücksetzen
-        deleteName();          // Name im Backend löschen
-    };
-
-    // Initial die Mitarbeiter-Daten abrufen
-    useEffect(() => {
-        fetchMitarbeiter();
-        loadUserName(); // Benutzername beim Laden der Seite einlesen
-    }, []);
-
-    // Wenn kein User ausgewählt wurde, zeigt die Auswahl der Mitarbeiter
-    if (!selectedUser) {
+    // Login-Screen
+    if (!isLoggedIn) {
         return (
-            <div className="container" style={{ marginTop: '5%' }}>
-                <h2>Ressource anmelden</h2>
-                <select
-                    onChange={async (e) => {
-                        const usernummer = parseInt(e.target.value);  // Usernummer aus der Auswahl holen
-                        const user = tableData.find((user) => user.usernummer === usernummer);
-
-                        console.log('Usernummer:', usernummer);  // Log für Debugging
-                        console.log('User:', user);              // Log für Debugging
-
-                        if (user) {
-                            setSelectedUser(user);  // User auswählen
-                            setUsernummer(usernummer); // Setze die Usernummer
-
-                            // Log, um den Namen zu prüfen
-                            console.log('Benutzername:', userName);
-
-                            if (userName) {
-                                try {
-                                    const response = await fetch('http://localhost:3520/api/user/updateName', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            usernummer: usernummer,
-                                            name: userName // Verwende userName statt name
-                                        }),
-                                    });
-
-                                    if (!response.ok) {
-                                        const message = await response.text();
-                                        throw new Error(message || 'Fehler beim Aktualisieren des Namens');
-                                    }
-                                    console.log('Name erfolgreich aktualisiert');
-                                } catch (error) {
-                                    console.error('Fehler beim Aktualisieren des Namens:', error.message);
-                                    alert(`Fehler: ${error.message}`);
-                                }
-                            } else {
-                                console.log('Fehler: Benutzername ist leer');
-                            }
-                        } else {
-                            console.log('Fehler: User nicht gefunden');
-                        }
-                    }}
-                >
-                    <option value="">-- Bitte auswählen --</option>
-                    {tableData.map((user) => (
-                        <option key={`${user.id}`} value={user.usernummer}>
-                            Usernummer {user.usernummer}
-                        </option>
-                    ))}
-                </select>
-
-                {/* Textfeld für den Namen */}
-                <div>
-                    <input
-                        type="text"
-                        id="userName"
-                        value={userName}
-                        onChange={(e) => {
-                            const name = e.target.value;
-                            setUserName(name);
-                            saveUserName(name); // Speichern des Namens
-                        }}
-                        placeholder="Geben Sie Ihren Namen ein"
-                    />
-                </div>
+            <div className="container">
+                <h2>Login</h2>
+                {showError}
+                <input
+                    type="text"
+                    placeholder="Benutzername"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <button onClick={handleLogin}>Einloggen</button>
             </div>
         );
     }
 
-    // Wenn ein User ausgewählt wurde, zeige den Status und Usernummer an
+    // 2FA-Screen
+    if (!is2FAVerified) {
+        return (
+            <div className="container">
+                <h2>2FA-Überprüfung</h2>
+                {showError}
+                <input
+                    type="text"
+                    placeholder="OTP-Code"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                />
+                <button onClick={handleVerifyOTP}>Bestätigen</button>
+            </div>
+        );
+    }
+
+    // Hauptansicht nach erfolgreichem Login und 2FA
+    if (!userData) {
+        return <p>Daten werden geladen...</p>;
+    }
+
     return (
-        <div className="container" style={{ marginTop: '5%' }}>
-            <h2>Usernummer: {usernummer}</h2>
-            <p>Name: {userName || "Nicht gesetzt"}</p>
-            <p>Status: {currentStatus || "Nicht gesetzt"}</p>
-            <button onClick={logoutUser}>Abmelden</button>
+        <div className="container">
+            <h2>Benutzerinformationen</h2>
+            <div className="user-info">
+                <p><strong>Name:</strong> {userData.name}</p>
+                <p><strong>Status:</strong> {userData.status}</p>
+                <p><strong>Ressource:</strong> {userData.ressource}</p>
+            </div>
+            <h3>Status ändern</h3>
             <div className="status-container">
                 {statuses.map((status) => (
                     <div
@@ -208,11 +192,13 @@ const Mobile = () => {
                         className={`box ${status.text}`}
                         onClick={() => setStatus(status.text)}
                     >
-                        <div className="box-number">{status.id}</div>
-                        <div className="status-text">{status.text}</div>
+                        <p>{status.text}</p>
                     </div>
                 ))}
             </div>
+            <button className="logout-button" onClick={handleLogout}>
+                Logout
+            </button>
         </div>
     );
 };
