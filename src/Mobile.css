@@ -106,6 +106,22 @@ h2 {
     color: #333;
 }
 
+.logout-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.logout-button:hover {
+    background-color: darkred;
+}
+
+
 /* Auf Mobile anpassen */
 @media (max-width: 600px) {
     .status-container {

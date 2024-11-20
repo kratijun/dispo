@@ -35,6 +35,30 @@ body {
   white-space: nowrap;
 }
 
+/* CSS für die Hover-Box */
+.hover-box {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px;  /* Größerer Abstand innerhalb der Box */
+  border-radius: 5px;
+  font-size: 14px;
+  width: 250px; /* Breiterer Abstand für mehr Text */
+  z-index: 1000;
+}
+
+/* Abstand zwischen den einzelnen Textabschnitten (p-Tag) */
+.hover-box p {
+  margin-bottom: 1px;  /* Mehr Abstand zwischen den einzelnen Zeilen */
+  line-height: 1.6;  /* Zeilenhöhe, um die Lesbarkeit zu verbessern */
+}
+
+/* Optional: Falls du den Abstand zwischen dem Text und der Boxkante noch weiter anpassen möchtest */
+.hover-box p:first-child {
+  margin-top: 0; /* Entfernt oberen Abstand bei der ersten Zeile */
+}
+
+
 .navbar{
   height: 60px;
 }
