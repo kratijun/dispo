@@ -19,6 +19,7 @@ const Mobile = () => {
     const [otpCode, setOtpCode] = useState('');
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null); // Fehlerstatus
+    const [isLoading, setIsLoading] = useState(false); // Ladezustand
 
     // Login-Handler
     const handleLogin = async () => {
@@ -37,7 +38,6 @@ const Mobile = () => {
 
             const { username: user } = await response.json();
             localStorage.setItem('username', username);
-            alert('Passwort korrekt, OTP wurde gesendet!');
             setIsLoggedIn(true);
         } catch (error) {
             console.error('Fehler beim Login:', error.message);
@@ -60,7 +60,6 @@ const Mobile = () => {
                 throw new Error(message || 'OTP-Überprüfung fehlgeschlagen');
             }
 
-            alert('2FA erfolgreich!');
             setIs2FAVerified(true);
             fetchUserData();
         } catch (error) {
@@ -72,10 +71,12 @@ const Mobile = () => {
     // Benutzer-Daten abrufen
     const fetchUserData = async () => {
         setError(null);
+        setIsLoading(true);
         try {
             const username = localStorage.getItem('username');
             if (!username) {
-                console.error("Benutzername fehlt");
+                setError('Benutzername fehlt. Bitte erneut einloggen.');
+                setIsLoading(false);
                 return;
             }
 
@@ -93,6 +94,8 @@ const Mobile = () => {
         } catch (error) {
             console.error('Fehler beim Abrufen der Benutzerdaten:', error.message);
             setError(error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -127,21 +130,37 @@ const Mobile = () => {
     };
 
     // Fehleranzeige
-    const showError = error && <p className="error">{error}</p>;
+    const getErrorMessage = (message) => {
+        switch (message) {
+            case 'Benutzername fehlt. Bitte erneut einloggen.':
+                return 'Der Benutzername konnte nicht gefunden werden. Bitte melden Sie sich erneut an.';
+            case 'Fehler beim Abrufen der Benutzerdaten':
+                return 'Es gab ein Problem beim Abrufen Ihrer Daten. Versuchen Sie es später erneut.';
+            case 'Ungültiger OTP-Code':
+                return 'Ungültiger OTP-Code.';
+            default:
+                return message;
+        }
+    };
+
+    const showError = error && <p className="error">{getErrorMessage(error)}</p>;
 
     // Logout-Handler
     const handleLogout = () => {
         localStorage.removeItem('username'); // Benutzernamen aus dem localStorage entfernen
-        setIsLoggedIn(false); // Den Login-Zustand zurücksetzen
-        setUserData(null); // Benutzer-Daten zurücksetzen
-        alert('Du hast dich erfolgreich abgemeldet');
+        setIsLoggedIn(false);
+        setIs2FAVerified(false);
+        setUsername('');
+        setUserData(null);
+
+        setOtpCode('');
     };
 
     // Login-Screen
     if (!isLoggedIn) {
         return (
             <div className="container">
-                <h2>Login</h2>
+                <h2>Ressourcen-Anmeldung</h2>
                 {showError}
                 <input
                     type="text"
@@ -172,13 +191,18 @@ const Mobile = () => {
     }
 
     // Hauptansicht nach erfolgreichem Login und 2FA
+    if (isLoading) {
+        return <p>Lade Benutzerdaten...</p>;
+    }
+
     if (!userData) {
-        return <p>Daten werden geladen...</p>;
+        return <p>Benutzerdaten konnten nicht geladen werden.</p>;
     }
 
     return (
         <div className="container">
             <h2>Benutzerinformationen</h2>
+            {showError}
             <div className="user-info">
                 <p><strong>Name:</strong> {userData.name}</p>
                 <p><strong>Status:</strong> {userData.status}</p>

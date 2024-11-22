@@ -24,7 +24,7 @@ function App() {
         };
 
         // WebSocket-Verbindung schließen, wenn Component unmounted wird
-        // return () => ws.close();
+        return () => ws.close();
     }, []);
 
     // Funktion zum Abrufen der Mitarbeiterdaten
@@ -94,7 +94,6 @@ function App() {
             });
     };
 
-
     return (
         <div>
             <nav className="navbar navbar-dark bg-primary navbar-expand-lg">
@@ -107,10 +106,10 @@ function App() {
                     <div className="collapse navbar-collapse" id="navbarText">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="/">Webansicht Staplerfahrer</a>
+                                <a className="nav-link active" aria-current="page" href="/admin">Webansicht</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link disabled" href="/pwnressources">Ressourcenverwaltung</a>
+                                <a className="nav-link" href="/ressource-management">Ressourcenverwaltung</a>
                             </li>
                             <li className="nav-item">
                                 <a className="nav-link disabled" href="/pwngps">GPS-Ansicht</a>
@@ -140,11 +139,10 @@ function App() {
                     </thead>
                     <tbody>
                     {tableData
-                        .filter((row) => row.status !== 'Abgemeldet') // Filtert "Abgemeldete" aus
                         .map((row, index) => (
                             <tr key={index}>
                                 <td
-                                    style={{ position: 'relative' }}
+                                    style={{position: 'relative'}}
                                     onMouseEnter={() => handleMouseEnter(row)} // Hover-Daten setzen
                                     onMouseLeave={handleMouseLeave} // Hover-Daten löschen
                                 >
@@ -152,21 +150,33 @@ function App() {
                                     {hoveredRessource && hoveredRessource.ressource === row.ressource && (
                                         <div className="hover-box">
                                             <p><i className="fas fa-user"></i> <strong>Fahrer:</strong> {row.name}</p>
-                                            <p><i className="fas fa-phone-alt"></i> <strong>DW od. KW:</strong> {row.dw}</p>
-                                            <p><i className="fas fa-clock"></i> <strong>Arbeitszeit:</strong> {row.az}</p>
+                                            <p><i className="fas fa-phone-alt"></i> <strong>DW od. KW:</strong> {row.dw}
+                                            </p>
+                                            <p><i className="fas fa-clock"></i> <strong>Arbeitszeit:</strong> {row.az}
+                                            </p>
                                         </div>
                                     )}
                                 </td>
                                 <td>{row.name}</td>
-                                <td className={`status-cell ${row.status}`} style={{ textAlign: 'center' }}>
+                                <td className={`status-cell ${row.status}`} style={{textAlign: 'center'}}>
                                     {row.status}
                                 </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <span onClick={() => handleEdit(row)}>
-                                        {row.text || <span>&nbsp;</span>} {/* Wenn kein Text, dann Leerzeichen */}
-                                    </span>
+                                <td style={{textAlign: 'center'}}>
+                                    {row.text || <span>&nbsp;</span>}
+                                    <i
+                                        className="fas fa-pen"
+                                        style={{
+                                            cursor: 'pointer', // Zeigt den Zeiger an, um Interaktivität zu signalisieren
+                                            fontSize: '0.8rem', // Größe des Stift-Icons anpassen
+                                            marginLeft: '8px', // Platz zwischen Text und Icon
+                                            color: '#007bff' // Optional: Stiftfarbe (z.B. Blau für Bootstrap-Theme)
+                                        }}
+                                        onClick={() => handleEdit(row)} // Klick-Event für das Icon
+                                        title="Bearbeiten" // Tooltip beim Überfahren mit der Maus
+                                    ></i>
                                 </td>
-                                <td style={{ textAlign: 'center' }}>{row.seit}</td>
+
+                                <td style={{textAlign: 'center'}}>{row.seit}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -174,7 +184,8 @@ function App() {
             </div>
 
             {/* Modal für die Textbearbeitung */}
-            <div className="modal fade" id="editModal" tabIndex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div className="modal fade" id="editModal" tabIndex="-1" aria-labelledby="editModalLabel"
+                 aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">

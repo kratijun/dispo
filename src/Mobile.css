@@ -15,6 +15,30 @@ body {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 10%
+}
+
+.error {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 0, 0, 0.1); /* Leicht transparentes Rot */
+    border: 1px solid rgba(255, 0, 0, 0.5); /* Roter Rand */
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #d8000c; /* Sattes Rot für den Text */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+}
+
+.error-icon {
+    margin-right: 10px;
+    font-size: 18px; /* Größe des Icons */
+}
+
+.error-text {
+    flex: 1;
+    line-height: 1.4;
 }
 
 /* Container für die Status-Boxen */
