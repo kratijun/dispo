@@ -29,7 +29,7 @@ function App() {
 
     // Funktion zum Abrufen der Mitarbeiterdaten
     const fetchMitarbeiter = () => {
-        fetch(import.meta.env.BASE_URL +'/api/user/getUserData')
+        fetch('93.127.202.69:3520/api/user/getUserData')
             .then((response) => response.json())
             .then((data) => setTableData(data))
             .catch((error) => console.error('Fehler beim Abrufen der Mitarbeiterdaten:', error));
@@ -59,7 +59,7 @@ function App() {
         if (!editingRow) return;
 
         // Update im Backend durchführen
-        fetch(import.meta.env.BASE_URL +'/api/user/updateZusatz', {
+        fetch('93.127.202.69:3520/api/user/updateZusatz', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ function App() {
             .then((data) => {
                 console.log(data); // Erfolgsnachricht vom Backend (optional)
                 // WebSocket-Update senden
-                const ws = new WebSocket('ws://93.127.202.69:3520');
+                const ws = new WebSocket('ws://localhost:3520');
                 ws.onopen = () => {
                     ws.send(JSON.stringify({ message: 'update' }));
                 };
