@@ -13,7 +13,7 @@ function App() {
         fetchMitarbeiter();
 
         // WebSocket-Verbindung zum Server herstellen
-        const ws = new WebSocket('ws://93.127.202.69:3520');
+        const ws = new WebSocket('wss://93.127.202.69:3520');
 
         // Bei Empfang einer Nachricht wird `fetchMitarbeiter` erneut aufgerufen
         ws.onmessage = (event) => {
@@ -78,7 +78,7 @@ function App() {
             .then((data) => {
                 console.log(data); // Erfolgsnachricht vom Backend (optional)
                 // WebSocket-Update senden
-                const ws = new WebSocket('ws://localhost:3520');
+                const ws = new WebSocket('wss://93.127.202.69:3520');
                 ws.onopen = () => {
                     ws.send(JSON.stringify({ message: 'update' }));
                 };
