@@ -13,7 +13,7 @@ function App() {
         fetchMitarbeiter();
 
         // WebSocket-Verbindung zum Server herstellen
-        const ws = new WebSocket('ws://localhost:3520');
+        const ws = new WebSocket('ws://forum.alpenreich.eu:3520');
 
         // Bei Empfang einer Nachricht wird `fetchMitarbeiter` erneut aufgerufen
         ws.onmessage = (event) => {
@@ -29,7 +29,7 @@ function App() {
 
     // Funktion zum Abrufen der Mitarbeiterdaten
     const fetchMitarbeiter = () => {
-        fetch('http://localhost:3520/api/user/getUserData')
+        fetch(import.meta.env.BASE_URL +'/api/user/getUserData')
             .then((response) => response.json())
             .then((data) => setTableData(data))
             .catch((error) => console.error('Fehler beim Abrufen der Mitarbeiterdaten:', error));
@@ -59,7 +59,7 @@ function App() {
         if (!editingRow) return;
 
         // Update im Backend durchführen
-        fetch('http://localhost:3520/api/user/updateZusatz', {
+        fetch(import.meta.env.BASE_URL +'/api/user/updateZusatz', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
