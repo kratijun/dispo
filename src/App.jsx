@@ -29,7 +29,7 @@ function App() {
 
     // Funktion zum Abrufen der Mitarbeiterdaten
     const fetchMitarbeiter = () => {
-        fetch('93.127.202.69:3520/api/user/getUserData')
+        fetch('https://93.127.202.69:3520/api/user/getUserData')
             .then((response) => response.json())
             .then((data) => setTableData(data))
             .catch((error) => console.error('Fehler beim Abrufen der Mitarbeiterdaten:', error));
@@ -59,7 +59,7 @@ function App() {
         if (!editingRow) return;
 
         // Update im Backend durchführen
-        fetch('93.127.202.69:3520/api/user/updateZusatz', {
+        fetch('https://93.127.202.69:3520/api/user/updateZusatz', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
