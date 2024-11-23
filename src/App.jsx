@@ -90,7 +90,7 @@ function App() {
                 setUpdatedText('');
             })
             .catch((error) => {
-                console.error('Fehler beim Speichern der Änderungen:', error);
+                console.error('Fehler beim Speichern der Änderungen.:', error);
             });
     };
 
